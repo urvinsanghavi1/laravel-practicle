@@ -4,6 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use App\Constants\MainTableConstans as mtc;
+
 return new class extends Migration
 {
     /**
@@ -13,11 +14,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create(mtc::USER_TABLE_NAME, function (Blueprint $table) {
+        Schema::create(mtc::COMPANY_TABLE_NAME, function (Blueprint $table) {
             $table->id();
-            $table->char(mtc::USER_TABLE_USER_NAME);
-            $table->string(mtc::USER_TABLE_EMAIL)->unique();
-            $table->string(mtc::USER_TABLE_PASSWORD);
+            $table->string(mtc::COMPANY_TABLE_COMPANY_NAME, 100);
+            $table->boolean(mtc::COMPANY_TABLE_STATUS);
             $table->timestamps();
             $table->softDeletes();
         });
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(mtc::USER_TABLE_NAME);
+        Schema::dropIfExists(mtc::COMPANY_TABLE_NAME);
     }
 };
