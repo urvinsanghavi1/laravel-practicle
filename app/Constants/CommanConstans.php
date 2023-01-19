@@ -9,6 +9,7 @@ class CommanConstans
     const STATE_API_URL = "https://countriesnow.space/api/v0.1/countries/states";
     const CITY_API_URL = "https://countriesnow.space/api/v0.1/countries/state/cities";
 
+    const TENANT_CONNECTION_NAME = "tenant";
 
 }
 

@@ -40,7 +40,7 @@ class MainTableConstans
 
     const COMPANY_PROFILE_TABLE = "company_profile";
     const COMPANY_PROFILE_ID = "id";
-    const COMPANY_PROFILE_COMPANY_ID = 'company_id';
+    const COMPANY_PROFILE_COMPANY_NAME = 'company_name';
     const COMPANY_PROFILE_EMAIL = "email";
     const COMPANY_PROFILE_PASSWORD = "password";
     const COMPANY_PROFILE_WEBSITE = "website";

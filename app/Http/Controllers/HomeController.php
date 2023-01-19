@@ -124,16 +124,16 @@ class HomeController extends Controller
         $request->validate(
             [
                 mtc::COMPANY_TABLE_COMPANY_NAME => ['required', 'max:100'],
-                // mtc::COMPANY_PROFILE_EMAIL => ['required', 'unique:email', 'max:100'],
-                // mtc::COMPANY_PROFILE_PASSWORD => ['required', 'max:16', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[@$!%*#?&]/'],
-                // mtc::COMPANY_PROFILE_WEBSITE => ['required'],
-                // mtc::COMPANY_PROFILE_LICENSE_NUMBER => ['required', 'max:50'],
-                // mtc::COMPANY_PROFILE_ADDRESS => ['required', 'max:500'],
+                mtc::COMPANY_PROFILE_EMAIL => ['required', 'unique:email', 'max:100'],
+                mtc::COMPANY_PROFILE_PASSWORD => ['required', 'max:16', 'min:8', 'regex:/[a-z]/', 'regex:/[A-Z]/', 'regex:/[@$!%*#?&]/'],
+                mtc::COMPANY_PROFILE_WEBSITE => ['required'],
+                mtc::COMPANY_PROFILE_LICENSE_NUMBER => ['required', 'max:50'],
+                mtc::COMPANY_PROFILE_ADDRESS => ['required', 'max:500'],
             ]
-            // ,
-            // [
-            //     'password.regex' => "Password must contain 1 capital letter, 1 small letter, and 1 special characters."
-            // ]
+            ,
+            [
+                'password.regex' => "Password must contain 1 capital letter, 1 small letter, and 1 special characters."
+            ]
         );
 
         try {
