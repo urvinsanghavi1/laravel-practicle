@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Constants\MainTableConstans as mtc;
 
-class tenant extends Model
+class Tenant extends Model
 {
     use HasFactory;
 
@@ -27,7 +27,8 @@ class tenant extends Model
         mtc::TENANT_TABLE_PORT,
         mtc::TENANT_TABLE_DBNAME,
         mtc::TENANT_TABLE_DBUSERNAME,
-        mtc::TENANT_TABLE_COMPANY_ID
+        mtc::TENANT_TABLE_COMPANY_ID,
+        mtc::TENANT_TABLE_DBPASSWORD
     ];
 
     /**
@@ -36,6 +37,6 @@ class tenant extends Model
      * @var array<int, string>
      */
     protected $hidden = [
-        mtc::USER_TABLE_PASSWORD
+        mtc::TENANT_TABLE_DBPASSWORD
     ];
 }

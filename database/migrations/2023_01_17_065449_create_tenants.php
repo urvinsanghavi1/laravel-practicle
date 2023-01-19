@@ -21,7 +21,7 @@ return new class extends Migration
             $table->integer(mtc::TENANT_TABLE_PORT)->default(mtc::PORT_DEFAULT_VALUE);
             $table->string(mtc::TENANT_TABLE_DBNAME);
             $table->string(mtc::TENANT_TABLE_DBUSERNAME);
-            $table->string(mtc::USER_TABLE_PASSWORD);
+            $table->string(mtc::TENANT_TABLE_DBPASSWORD);
             $table->timestamps();
             $table->foreign(mtc::TENANT_TABLE_COMPANY_ID)->references(mtc::COMPANY_TABLE_ID)->on(mtc::COMPANY_TABLE_NAME);
         });

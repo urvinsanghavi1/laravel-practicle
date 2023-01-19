@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create(mtc::COMPANY_TABLE_NAME, function (Blueprint $table) {
             $table->id();
             $table->string(mtc::COMPANY_TABLE_COMPANY_NAME, 100);
-            $table->boolean(mtc::COMPANY_TABLE_STATUS);
+            $table->boolean(mtc::COMPANY_TABLE_STATUS)->default(mtc::DEFAULT_STATUE_VALUE);
             $table->timestamps();
             $table->softDeletes();
         });
