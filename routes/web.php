@@ -14,13 +14,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::post('/login', [HomeController::class, 'login'])->name('login');
-Route::get('/register', [HomeController::class, 'register'])->name('register');
-Route::post('/changeLocation/{name}',[HomeController::class, 'changeLocation'])->name('changeLocation');
-Route::post('/register-company', [HomeController::class, 'registerCompany'])->name('register-company');
+// tenant routes
+Route::group(['domain' => '{subdomain}.' . config('app.base_domain'), 'middleware' => ['tenant']], function () {
+    Route::get('/', [HomeController::class, 'index']);
+    Route::post('/login', [HomeController::class, 'login'])->name('login');
+});
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [HomeController::class, 'home']);
-    Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
+Route::group(['domain' => config('app.base_domain')], function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::post('/login', [HomeController::class, 'login'])->name('login');
+    Route::get('/register', [HomeController::class, 'register'])->name('register');
+    Route::post('/changeLocation/{name}', [HomeController::class, 'changeLocation'])->name('changeLocation');
+    Route::post('/register-company', [HomeController::class, 'registerCompany'])->name('register-company');
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/home', [HomeController::class, 'home']);
+        Route::get('/logout', [HomeController::class, 'logout'])->name('logout');
+    });
 });

@@ -34,13 +34,14 @@ class MainTableConstans
     const TENANT_TABLE_DBNAME = 'dbname';
     const TENANT_TABLE_DBUSERNAME = 'dbusername';    
     const TENANT_TABLE_DBPASSWORD = 'dbpassword';
+    const TENANT_TABLE_DOMAIN_NAME = 'domain';
     const TENANT_TABLE_CREATED_AT = 'created_at';
     const TENANT_TABLE_UPDATED_AT = 'updated_at';
     const TENANT_TABLE_DELETED_AT = 'deleted_at';
 
     const COMPANY_PROFILE_TABLE = "company_profile";
     const COMPANY_PROFILE_ID = "id";
-    const COMPANY_PROFILE_COMPANY_NAME = 'company_name';
+    const COMPANY_PROFILE_COMPANY_NAME = 'name';
     const COMPANY_PROFILE_EMAIL = "email";
     const COMPANY_PROFILE_PASSWORD = "password";
     const COMPANY_PROFILE_WEBSITE = "website";

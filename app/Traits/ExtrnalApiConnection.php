@@ -2,7 +2,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Http;
-use App\Constants\CommanConstans as cc;
+use App\Constants\CommanConstans as commanConstans;
 
 /**
  *  Get the Data from Extrnal API
@@ -38,7 +38,7 @@ trait ExtrnalApiConnection
     public function getCountry()
     {
         $countries = [];
-        $url = cc::COUNTRY_API_URL;
+        $url = commanConstans::COUNTRY_API_URL;
         $countryData = $this->getDataFromApi($url, "GET");
         if(isset($countryData['data'])){
             $countries = array_map(function ($ar) {return $ar['name'];}, $countryData['data']);
@@ -54,7 +54,7 @@ trait ExtrnalApiConnection
     public function getStatesByCountry($countryName)
     {
         $states = [];
-        $url = cc::STATE_API_URL;
+        $url = commanConstans::STATE_API_URL;
         $parms = [ 'country' => $countryName ];
         $statesData = $this->getDataFromApi($url, "POST", $parms);
         if(isset($statesData['data']['states'])){
@@ -70,7 +70,7 @@ trait ExtrnalApiConnection
      */
     public function getCityByState($countryName, $stateName)
     {
-        $url = cc::CITY_API_URL;
+        $url = commanConstans::CITY_API_URL;
         $parms = [ 'country' => $countryName, 'state' => $stateName ];
         $citiesData = $this->getDataFromApi($url, "POST", $parms);
         return $citiesData['data'];

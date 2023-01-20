@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Constants\MainTableConstans as mtc;
+use App\Constants\MainTableConstans as mainTableConstans;
 
 class Company extends Model
 {
@@ -16,7 +16,7 @@ class Company extends Model
      *
      * @var string
      */
-    protected $table = mtc::COMPANY_TABLE_NAME;
+    protected $table = mainTableConstans::COMPANY_TABLE_NAME;
 
     /**
      * The attributes that are mass assignable.
@@ -24,7 +24,7 @@ class Company extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        mtc::COMPANY_TABLE_COMPANY_NAME,
-        mtc::COMPANY_TABLE_STATUS
+        mainTableConstans::COMPANY_TABLE_COMPANY_NAME,
+        mainTableConstans::COMPANY_TABLE_STATUS
     ];
 }

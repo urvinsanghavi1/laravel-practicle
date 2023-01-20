@@ -11,6 +11,10 @@ class CommanConstans
 
     const TENANT_CONNECTION_NAME = "tenant";
 
+    const SECRET_KEY = "KAJDSLKDJS23847238AJIAOIAD";
+    const SECRET_IV = "LAKDJSJKJKNADJSa87asdaosdad";
+    const ENCRYPT_METHOD = "AES-256-CBC";
+
 }
 
 ?>

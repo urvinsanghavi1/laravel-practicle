@@ -35,6 +35,10 @@
         setTimeout(function() {
             $('.alert-danger').fadeOut('fast');
         }, 2000);
+
+        setTimeout(function() {
+            $('.alert-success').fadeOut('fast');
+        }, 2000);
     </script>
 </head>
 

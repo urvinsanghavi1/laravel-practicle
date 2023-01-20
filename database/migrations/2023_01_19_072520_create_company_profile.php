@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Constants\MainTableConstans as mtc;
+use App\Constants\MainTableConstans as mainTableConstans;
 use Illuminate\Support\Facades\Session;
 
 return new class extends Migration
@@ -17,17 +17,17 @@ return new class extends Migration
     {
         $connection = session('connection');
         if($connection){
-            Schema::connection($connection)->create(mtc::COMPANY_PROFILE_TABLE, function (Blueprint $table) {
+            Schema::connection($connection)->create(mainTableConstans::COMPANY_PROFILE_TABLE, function (Blueprint $table) {
                 $table->id();
-                $table->string(mtc::COMPANY_PROFILE_COMPANY_NAME, 100);
-                $table->string(mtc::COMPANY_PROFILE_EMAIL, 100);
-                $table->char(mtc::COMPANY_PROFILE_PASSWORD, 6);
-                $table->string(mtc::COMPANY_PROFILE_WEBSITE);
-                $table->char(mtc::COMPANY_PROFILE_LICENSE_NUMBER, 50);
-                $table->text(mtc::COMPANY_PROFILE_ADDRESS, 500);
-                $table->char(mtc::COMPANY_PROFILE_COUNTRY, 50);
-                $table->char(mtc::COMPANY_PROFILE_STATE, 50);
-                $table->char(mtc::COMPANY_PROFILE_CITY, 50);
+                $table->string(mainTableConstans::COMPANY_PROFILE_COMPANY_NAME, 100);
+                $table->string(mainTableConstans::COMPANY_PROFILE_EMAIL, 100);
+                $table->string(mainTableConstans::COMPANY_PROFILE_PASSWORD, 100);
+                $table->string(mainTableConstans::COMPANY_PROFILE_WEBSITE);
+                $table->char(mainTableConstans::COMPANY_PROFILE_LICENSE_NUMBER, 50);
+                $table->text(mainTableConstans::COMPANY_PROFILE_ADDRESS, 500);
+                $table->char(mainTableConstans::COMPANY_PROFILE_COUNTRY, 50);
+                $table->char(mainTableConstans::COMPANY_PROFILE_STATE, 50);
+                $table->char(mainTableConstans::COMPANY_PROFILE_CITY, 50);
                 $table->timestamps(); 
             });
         }
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(mtc::COMPANY_PROFILE_TABLE);
+        Schema::dropIfExists(mainTableConstans::COMPANY_PROFILE_TABLE);
     }
 };

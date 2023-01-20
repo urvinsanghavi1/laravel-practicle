@@ -9,7 +9,7 @@
 
         <div class="bg-secondary rounded h-100 p-4">
             <h4 class="mb-4">Login Form</h4>
-            <form action="{{ route('login') }}" method="post" autocomplete="off">
+            <form action="{{ url('/login') }}" method="post" autocomplete="off">
                 @csrf
                 <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email address</label>

@@ -143,6 +143,8 @@ return [
         // 'store'  => 'redis',
     ],
 
+    'base_domain' => env('APP_BASE_DOMAIN'),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers

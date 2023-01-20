@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use App\Constants\MainTableConstans as mtc;
+use App\Constants\MainTableConstans as mainTableConstans;
 
 return new class extends Migration
 {
@@ -14,16 +14,17 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create(mtc::TENANT_TABLE_NAME, function (Blueprint $table) {
+        Schema::create(mainTableConstans::TENANT_TABLE_NAME, function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger(mtc::TENANT_TABLE_COMPANY_ID);
-            $table->string(mtc::TENANT_TABLE_HOSTNAME, 10)->default(mtc::HOSTNAME_DEFAULT_VALUE);
-            $table->integer(mtc::TENANT_TABLE_PORT)->default(mtc::PORT_DEFAULT_VALUE);
-            $table->string(mtc::TENANT_TABLE_DBNAME);
-            $table->string(mtc::TENANT_TABLE_DBUSERNAME);
-            $table->string(mtc::TENANT_TABLE_DBPASSWORD);
+            $table->unsignedBigInteger(mainTableConstans::TENANT_TABLE_COMPANY_ID);
+            $table->string(mainTableConstans::TENANT_TABLE_HOSTNAME, 10)->default(mainTableConstans::HOSTNAME_DEFAULT_VALUE);
+            $table->integer(mainTableConstans::TENANT_TABLE_PORT)->default(mainTableConstans::PORT_DEFAULT_VALUE);
+            $table->string(mainTableConstans::TENANT_TABLE_DBNAME);
+            $table->string(mainTableConstans::TENANT_TABLE_DBUSERNAME);
+            $table->string(mainTableConstans::TENANT_TABLE_DBPASSWORD);
+            $table->string(mainTableConstans::TENANT_TABLE_DOMAIN_NAME, 30)->unique();
             $table->timestamps();
-            $table->foreign(mtc::TENANT_TABLE_COMPANY_ID)->references(mtc::COMPANY_TABLE_ID)->on(mtc::COMPANY_TABLE_NAME);
+            $table->foreign(mainTableConstans::TENANT_TABLE_COMPANY_ID)->references(mainTableConstans::COMPANY_TABLE_ID)->on(mainTableConstans::COMPANY_TABLE_NAME);
         });
     }
 
@@ -34,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(mtc::TENANT_TABLE_NAME);
+        Schema::dropIfExists(mainTableConstans::TENANT_TABLE_NAME);
     }
 };
