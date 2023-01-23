@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\CommanConstans as commanConstans;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Traits\ExtrnalApiConnection;
 use App\Constants\MainTableConstans as mainTableConstans;
 use App\Models\Company;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Traits\MultiTenantProcess;
 use Illuminate\Support\Str;
 use App\Services\TenantManager;
+use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
 {
@@ -43,7 +46,6 @@ class HomeController extends Controller
      */
     public function login(Request $request)
     {
-        //check current url match with base url then super user login
         $request->validate([
             mainTableConstans::USER_TABLE_EMAIL => ['required', 'email', 'max:255'],
             mainTableConstans::USER_TABLE_PASSWORD => ['required', 'max:255'],
@@ -51,16 +53,35 @@ class HomeController extends Controller
 
         $data = $request->all();
         unset($data['_token']);
-        $user = Auth::getProvider()->retrieveByCredentials($data);
 
-        /** check if user credentials are not match then redirect to login page with error message. */
-        if (!$user) {
-            return redirect()->back()->withErrors(["message" => 'Email & Password Wrong.']);
+        try {
+            if (Str::contains(config('app.url'), url(''))) {
+                $data[mainTableConstans::USER_TABLE_PASSWORD] = $this->encrypt_decrypt("encrypt", $data[mainTableConstans::USER_TABLE_PASSWORD]);
+                $user = User::where($data)->first();
+                if (!$user) {
+                    return redirect()->back()->withErrors(["message" => 'Email & Password Wrong.']);
+                }
+
+                Auth::login($user);
+                Log::info("Super User Login Success");
+                return redirect('/home')->with('success', "Login Successfully.");;
+            } else {
+
+                $data[mainTableConstans::USER_TABLE_PASSWORD] = $this->encrypt_decrypt("encrypt", $data[mainTableConstans::USER_TABLE_PASSWORD]);
+                $userCheck  = DB::connection(commanConstans::TENANT_CONNECTION_NAME)->table(mainTableConstans::COMPANY_PROFILE_TABLE)->where($data)->first();
+                if ($userCheck) {
+                    session([
+                        "company_name" => $userCheck->name
+                    ]);
+                    Log::info("Company Login Success");
+                    return redirect('/home')->with('success', "Login Successfully.");
+                } else {
+                    return redirect()->back()->withErrors(["message" => 'Email & Password Wrong.']);
+                }
+            }
+        } catch (\Exception $exception) {
+            Log::error("Login Error | " . $exception->getMessage());
         }
-
-        Auth::login($user);
-
-        return redirect('/home');
     }
 
     /**
@@ -80,9 +101,11 @@ class HomeController extends Controller
     {
         Session::flush();
 
-        Auth::logout();
+        if (Str::contains(config('app.url'), url(''))) {
+            Auth::logout();
+        }
 
-        return redirect('/home');
+        return redirect('/');
     }
 
     /**
@@ -101,24 +124,28 @@ class HomeController extends Controller
      */
     public function changeLocation(Request $request, $name)
     {
-        $data = $request->all();
-        unset($data['_token']);
-        if ($name == "state") {
+        try {
+            $data = $request->all();
+            unset($data['_token']);
+            if ($name == "state") {
 
-            if (!isset($data['country'])) {
-                return "Please Select Country";
+                if (!isset($data['country'])) {
+                    return "Please Select Country";
+                }
+
+                $states = $this->getStatesByCountry($data['country']);
+                return $states;
+            } elseif ($name == "city") {
+
+                if (!isset($data['country']) && !isset($data['state'])) {
+                    return "Please Select State and Country";
+                }
+
+                $cities = $this->getCityByState($data['country'], $data['state']);
+                return $cities;
             }
-
-            $states = $this->getStatesByCountry($data['country']);
-            return $states;
-        } elseif ($name == "city") {
-
-            if (!isset($data['country']) && !isset($data['state'])) {
-                return "Please Select State and Country";
-            }
-
-            $cities = $this->getCityByState($data['country'], $data['state']);
-            return $cities;
+        } catch (\Exception $exception) {
+            Log::error("Change Location| Error | " . $exception->getMessage());
         }
     }
 
@@ -148,7 +175,7 @@ class HomeController extends Controller
         );
 
         try {
-           
+
             $companyName = trim(str_replace(' ', '_', Str::lower($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME])));
             $existCompany = Company::where(mainTableConstans::COMPANY_TABLE_COMPANY_NAME, $companyName)->first();
             if ($existCompany) {
@@ -163,10 +190,12 @@ class HomeController extends Controller
                 ]
             );
             DB::commit();
+            Log::info("Company Register Successfully | Company Table ");
+
             $companyId = $company->id;
             //create database for register company
+            Log::info("Database created for register company | Multi Tenant Step - 1 ");
             $this->databaseCreate($companyName);
-
             //tenant table store database information
             $password = config('database.connections.tenant.password');
             $subDomain = trim(preg_replace('/[^A-Za-z0-9\-]/', '', str_replace('_', '-', $companyName)));
@@ -180,6 +209,7 @@ class HomeController extends Controller
                 mainTableConstans::TENANT_TABLE_DOMAIN_NAME => $subDomain
             ];
 
+            Log::info("Store Information for Newly Created Database | Multi Tenant Step - 2");
             $this->storeDatabaseDetail($databaseDetails);
 
             //create table in customer database and Store data into new table
@@ -188,14 +218,61 @@ class HomeController extends Controller
             $data[mainTableConstans::COMPANY_PROFILE_CREATED_AT] = date('Y-m-d H:i:s');
             $data[mainTableConstans::COMPANY_PROFILE_UPDATED_AT] = date('Y-m-d H:i:s');
             $data[mainTableConstans::TENANT_TABLE_DOMAIN_NAME] = $subDomain;
-             
-            $this->createCustomerProfile($data);
-           
-            return redirect()->back()->with('success', Str::upper($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME]).' Company Registred Successfully.');
 
+            Log::info("Create Table for new tenant and store information about company | Multi Tenant Step - 3");
+            $this->createCustomerProfile($data);
+
+            return redirect()->back()->with('success', Str::upper($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME]) . ' Company Registred Successfully. Please Check Your Email !');
         } catch (\Exception $exception) {
             DB::rollBack();
             return $exception->getMessage();
+        }
+    }
+
+    /** 
+     * Profile Edit for New Company
+     * 
+     * @return redirect to edit profile page of company form with company data
+     */
+    public function profileEdit()
+    {
+        try {
+            $getUserDetails = DB::connection(commanConstans::TENANT_CONNECTION_NAME)->table(mainTableConstans::COMPANY_PROFILE_TABLE)
+                ->where(mainTableConstans::COMPANY_PROFILE_COMPANY_NAME, session('company_name'))->first();
+            $countries = $this->getCountry();
+            if ($getUserDetails) {
+                return view('company_registration.registration')->with(['getUserDetails' => $getUserDetails, 'countries' => $countries]);
+            } else {
+                Log::error(session('company_name') . " Data not Found.");
+            }
+        } catch (\Exception $exception) {
+            Log::error("Profile Edit | Error | " . $exception->getMessage());
+        }
+    }
+
+    /**
+     * Edit Profile and update companies data
+     * 
+     * @return redirect back to home page with updated information
+     */
+    public function editProfile(Request $request)
+    {
+        $data = $request->all();
+        unset($data['_token']);
+        $request->validate([
+            mainTableConstans::COMPANY_PROFILE_WEBSITE => ['required', 'regex:/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i'],
+            mainTableConstans::COMPANY_PROFILE_LICENSE_NUMBER => ['required', 'max:50'],
+            mainTableConstans::COMPANY_PROFILE_ADDRESS => ['required', 'max:500'],
+        ]);
+
+        try {
+            DB::beginTransaction();
+            DB::table(mainTableConstans::COMPANY_PROFILE_TABLE)->update($data);
+            DB::commit();
+            return redirect('/home')->with('success', 'Update Profile Successfully');
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            Log::error("Edit Profile | Error | " . $exception->getMessage());
         }
     }
 }

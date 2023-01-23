@@ -77,12 +77,14 @@ trait MultiTenantProcess
             $command = "migrate --database=tenant --path=/database/migrations/2023_01_19_072520_create_company_profile.php";
             Artisan::call($command);
 
+            Log::info("Tenant | Table Created for new company database");
+
             unset($data[mainTableConstans::TENANT_TABLE_DOMAIN_NAME]);
             //store data in table
             DB::beginTransaction();
             DB::connection(commanConstans::TENANT_CONNECTION_NAME)->table(mainTableConstans::COMPANY_PROFILE_TABLE)->insert($data);
             DB::commit();
-            Log::info("Tenant | Create Table For Customer Profile and Store Information.");
+            Log::info("Tenant | Customer Profile Store Information.");
 
             //send email to company user
             $this->sendEmail($emailData);
@@ -100,6 +102,7 @@ trait MultiTenantProcess
     public function setDatabase($databaseName): void
     {
         Config::set('database.connections.tenant.database', $databaseName);
+        Log::info("Switch Datbase Connection | " . $this->getDatabase());
     }
 
     /**

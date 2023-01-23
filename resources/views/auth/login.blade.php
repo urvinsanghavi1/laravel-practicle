@@ -8,7 +8,7 @@
         @enderror
 
         <div class="bg-secondary rounded h-100 p-4">
-            <h4 class="mb-4">Login Form</h4>
+            <h4 class="mb-4">Login</h4>
             <form action="{{ url('/login') }}" method="post" autocomplete="off">
                 @csrf
                 <div class="mb-3">

@@ -9,7 +9,7 @@
     <h1>{{ str_replace('-', ' ', strtoupper($details['name'])) }} Company Account Successfully Created.</h1>
     <p>hear all the detail for login</p>
     <ul>
-        <li>Login URL : <a href="http://{{ $details['domain'] }}/">{{ $details['domain'] }}</a></li>
+        <li>Login URL : <a href="http://{{ $details['domain'].str_replace('http://', '.', url('')) }}/">{{ $details['domain'] }}{{ str_replace("http://", ".", url('')) }}</a></li>
         <li>Username : {{ $details['email'] }}</li>
         <li>Password : {{ $details['password'] }}</li>
     </ul>

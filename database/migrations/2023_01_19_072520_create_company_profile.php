@@ -25,9 +25,9 @@ return new class extends Migration
                 $table->string(mainTableConstans::COMPANY_PROFILE_WEBSITE);
                 $table->char(mainTableConstans::COMPANY_PROFILE_LICENSE_NUMBER, 50);
                 $table->text(mainTableConstans::COMPANY_PROFILE_ADDRESS, 500);
-                $table->char(mainTableConstans::COMPANY_PROFILE_COUNTRY, 50);
-                $table->char(mainTableConstans::COMPANY_PROFILE_STATE, 50);
-                $table->char(mainTableConstans::COMPANY_PROFILE_CITY, 50);
+                $table->char(mainTableConstans::COMPANY_PROFILE_COUNTRY, 50)->nullable();
+                $table->char(mainTableConstans::COMPANY_PROFILE_STATE, 50)->nullable();
+                $table->char(mainTableConstans::COMPANY_PROFILE_CITY, 50)->nullable();
                 $table->timestamps(); 
             });
         }
