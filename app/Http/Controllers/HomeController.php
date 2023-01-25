@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use App\Traits\MultiTenantProcess;
 use Illuminate\Support\Str;
 use App\Services\TenantManager;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 
 class HomeController extends Controller
@@ -60,12 +61,12 @@ class HomeController extends Controller
                 $data[mainTableConstans::USER_TABLE_PASSWORD] = $this->encrypt_decrypt("encrypt", $data[mainTableConstans::USER_TABLE_PASSWORD]);
                 $user = User::where($data)->first();
                 if (!$user) {
-                    return redirect()->back()->withErrors(["message" => 'Email & Password Wrong.']);
+                    return redirect()->back()->withErrors(["message" => Lang::get('messages.auth_wrong')]);
                 }
 
                 Auth::login($user);
                 Log::info("Super User Login Success");
-                return redirect('/home')->with('success', "Login Successfully.");;
+                return redirect('/home')->with('success', Lang::get('messages.auth_success'));;
             } else {
                 DB::purge(CommanConstans::TENANT_CONNECTION_NAME);
                 $data[mainTableConstans::USER_TABLE_PASSWORD] = $this->encrypt_decrypt("encrypt", $data[mainTableConstans::USER_TABLE_PASSWORD]);
@@ -75,9 +76,9 @@ class HomeController extends Controller
                         "company_name" => $userCheck->name
                     ]);
                     Log::info("Company Login Success");
-                    return redirect('/home')->with('success', "Login Successfully.");
+                    return redirect('/home')->with('success', Lang::get('messages.auth_success'));
                 } else {
-                    return redirect()->back()->withErrors(["message" => 'Email & Password Wrong.']);
+                    return redirect()->back()->withErrors(["message" => Lang::get('validation.email')]);
                 }
             }
         } catch (\Exception $exception) {
@@ -131,7 +132,7 @@ class HomeController extends Controller
             if ($name == "state") {
 
                 if (!isset($data['country'])) {
-                    return "Please Select Country";
+                    return Lang::get('messages.country_error');
                 }
 
                 $states = $this->getStatesByCountry($data['country']);
@@ -139,7 +140,7 @@ class HomeController extends Controller
             } elseif ($name == "city") {
 
                 if (!isset($data['country']) && !isset($data['state'])) {
-                    return "Please Select State and Country";
+                    return Lang::get('messages.state_error');
                 }
 
                 $cities = $this->getCityByState($data['country'], $data['state']);
@@ -171,7 +172,7 @@ class HomeController extends Controller
                 mainTableConstans::COMPANY_PROFILE_ADDRESS => ['required', 'max:500'],
             ],
             [
-                'password.regex' => "Password must contain 1 capital letter, 1 small letter, and 1 special characters."
+                'password.regex' => Lang::get('messages.password_validation')
             ]
         );
 
@@ -180,12 +181,12 @@ class HomeController extends Controller
             $companyName = trim(str_replace(' ', '_', Str::lower($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME])));
             $existCompany = Company::where(mainTableConstans::COMPANY_TABLE_COMPANY_NAME, $companyName)->first();
             if ($existCompany) {
-                return redirect()->back()->withErrors(['message' => 'Company Name already Exist.']);
+                return redirect()->back()->withErrors(['message' => Lang::get('messages.exist')]);
             }
 
             event(new TenantProcess($companyName, $data));
 
-            return redirect()->back()->with('success', Str::upper($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME]) . ' Company Registred Successfully. Please Check Your Email !');
+            return redirect()->back()->with('success', Str::upper($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME]) . Lang::get('messages.company_login_success'));
         } catch (\Exception $exception) {
             DB::rollBack();
             return $exception->getMessage();
@@ -232,7 +233,7 @@ class HomeController extends Controller
             DB::beginTransaction();
             DB::table(mainTableConstans::COMPANY_PROFILE_TABLE)->update($data);
             DB::commit();
-            return redirect('/home')->with('success', 'Update Profile Successfully');
+            return redirect('/home')->with('success', Lang::get('messages.profile_update_success'));
         } catch (\Exception $exception) {
             DB::rollBack();
             Log::error("Edit Profile | Error | " . $exception->getMessage());
