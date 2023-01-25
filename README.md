@@ -1,4 +1,4 @@
-<img src="/img/Company-Registration.png" alt="laravel-practice" />
+<img src="/public/img/Company-Registration.png" alt="laravel-practice" />
 
 ## Steps To Setup Project
 
