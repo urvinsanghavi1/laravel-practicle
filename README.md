@@ -34,4 +34,9 @@ Company Admin
 - Run queue command for background process (php artisan queue:work)
 
 
+Super Admin Login Credentials
+
+Username : admin@admin.com
+Password : password
+
 Note: Log File - Laravel.log
