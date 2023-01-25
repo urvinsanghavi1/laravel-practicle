@@ -37,7 +37,7 @@ class TenantManager
             $tenant = Tenant::findOrFail((int) $tenant);
         }
 
-        config(['database.connections.tenant.database' => $tenant->domain]);
+        config(['database.connections.tenant.database' => $tenant->dbname]);
         \DB::purge('tenant');
         \DB::connection('tenant')->reconnect();
         $this->setTenant($tenant);
