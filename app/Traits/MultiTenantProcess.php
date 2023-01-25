@@ -27,9 +27,10 @@ trait MultiTenantProcess
             $charset = config("database.connections.tenant.charset", 'utf8mb4');
             $collation = config("database.connections.tenant.collation", 'utf8mb4_unicode_ci');
             $query = "CREATE DATABASE IF NOT EXISTS $schemaName CHARACTER SET $charset COLLATE $collation;";
-            $this->setDatabase($schemaName);
             DB::statement($query);
+            $this->setDatabase($schemaName);
             Log::info("Tenant | Database Created");
+            
         } catch (\Exception $exception) {
             Log::info("Tenant | databaseCreate Error | " . $exception->getMessage());
         }
@@ -61,33 +62,11 @@ trait MultiTenantProcess
     public function createCustomerProfile($data): void
     {
         try {
-            $emailData = [
-                mainTableConstans::TENANT_TABLE_DOMAIN_NAME => $data[mainTableConstans::TENANT_TABLE_DOMAIN_NAME],
-                mainTableConstans::COMPANY_PROFILE_COMPANY_NAME => $data[mainTableConstans::COMPANY_PROFILE_COMPANY_NAME],
-                mainTableConstans::COMPANY_PROFILE_PASSWORD => $this->encrypt_decrypt("decrypt", $data[mainTableConstans::COMPANY_PROFILE_PASSWORD]),
-                mainTableConstans::COMPANY_PROFILE_EMAIL => $data[mainTableConstans::COMPANY_PROFILE_EMAIL]
-            ];
-
             DB::purge(commanConstans::TENANT_CONNECTION_NAME);
-
-            //Set Connection in Session.
-            session(['connection' => commanConstans::TENANT_CONNECTION_NAME]);
-
-            //create table company profile
-            $command = "migrate --database=tenant --path=/database/migrations/2023_01_19_072520_create_company_profile.php";
-            Artisan::call($command);
-
-            Log::info("Tenant | Table Created for new company database");
-
-            unset($data[mainTableConstans::TENANT_TABLE_DOMAIN_NAME]);
-            //store data in table
             DB::beginTransaction();
             DB::connection(commanConstans::TENANT_CONNECTION_NAME)->table(mainTableConstans::COMPANY_PROFILE_TABLE)->insert($data);
             DB::commit();
             Log::info("Tenant | Customer Profile Store Information.");
-
-            //send email to company user
-            $this->sendEmail($emailData);
         } catch (\Exception $exception) {
             DB::rollBack();
             Log::info("Tenant | createCustomerProfile Error | " . $exception->getMessage());
@@ -132,24 +111,9 @@ trait MultiTenantProcess
         if ($action == 'encrypt') {
             $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
             $output = base64_encode($output);
-        } else if ($action == 'decrypt') {
+        } elseif ($action == 'decrypt') {
             $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
         }
         return $output;
-    }
-
-    /** 
-     * Send Email
-     * 
-     * @return void
-     */
-    public function sendEmail($emailData): void
-    {
-        try {
-            \Mail::to($emailData['email'])->send(new \App\Mail\sendCustomerEmail($emailData));
-            Log::info("Email Sent");
-        } catch (\Exception $exception) {
-            Log::error("MAIL ERROR | " . $exception->getMessage());
-        }
     }
 }

@@ -1,6 +1,6 @@
 @include('home.header')
 @if(session('company_name'))
-@include('home.side')
+    @include('home.side')
 @endif
 
 <div class="container">
@@ -102,7 +102,7 @@
                     <div class="mb-3 col-md-6">
                         <label class="form-label">State</label>
                         <select name="state" class="form-select mb-3 state">
-                            <option {{ isset($getUserDetails->state) ? 'selected' : null }} value="" disabled> Select State </option>
+                            <option {{ isset($getUserDetails->state) ? null : 'selected' }} value="" disabled> Select State </option>
                         </select>
                         <span class="text-danger text-danger-state"></span>
                         @if ($errors->has('state'))
@@ -112,7 +112,7 @@
                     <div class="mb-3 col-md-6">
                         <label class="form-label">City</label>
                         <select name="city" class="form-select mb-3 city">
-                            <option {{ isset($getUserDetails->city) ? 'selected' : null }} value="" disabled> Select City </option>
+                            <option {{ isset($getUserDetails->city) ? null : 'selected' }} value="" disabled> Select City </option>
                         </select>
                         @if ($errors->has('city'))
                         <span class="text-danger">{{ $errors->first('city') }}</span>

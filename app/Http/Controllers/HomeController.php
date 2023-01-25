@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use App\Traits\ExtrnalApiConnection;
 use App\Constants\MainTableConstans as mainTableConstans;
+use App\Events\TenantProcess;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +67,7 @@ class HomeController extends Controller
                 Log::info("Super User Login Success");
                 return redirect('/home')->with('success', "Login Successfully.");;
             } else {
-
+                DB::purge(CommanConstans::TENANT_CONNECTION_NAME);
                 $data[mainTableConstans::USER_TABLE_PASSWORD] = $this->encrypt_decrypt("encrypt", $data[mainTableConstans::USER_TABLE_PASSWORD]);
                 $userCheck  = DB::connection(commanConstans::TENANT_CONNECTION_NAME)->table(mainTableConstans::COMPANY_PROFILE_TABLE)->where($data)->first();
                 if ($userCheck) {
@@ -181,46 +182,8 @@ class HomeController extends Controller
             if ($existCompany) {
                 return redirect()->back()->withErrors(['message' => 'Company Name already Exist.']);
             }
-            //register company in main table
-            DB::beginTransaction();
-            $company = Company::create(
-                [
-                    mainTableConstans::COMPANY_TABLE_COMPANY_NAME => $companyName,
-                    mainTableConstans::COMPANY_TABLE_STATUS => 1
-                ]
-            );
-            DB::commit();
-            Log::info("Company Register Successfully | Company Table ");
 
-            $companyId = $company->id;
-            //create database for register company
-            Log::info("Database created for register company | Multi Tenant Step - 1 ");
-            $this->databaseCreate($companyName);
-            //tenant table store database information
-            $password = config('database.connections.tenant.password');
-            $subDomain = trim(preg_replace('/[^A-Za-z0-9\-]/', '', str_replace('_', '-', $companyName)));
-            $databaseDetails = [
-                mainTableConstans::TENANT_TABLE_HOSTNAME => mainTableConstans::HOSTNAME_DEFAULT_VALUE,
-                mainTableConstans::TENANT_TABLE_PORT => mainTableConstans::PORT_DEFAULT_VALUE,
-                mainTableConstans::TENANT_TABLE_DBNAME => $companyName,
-                mainTableConstans::TENANT_TABLE_DBUSERNAME => config('database.connections.tenant.username'),
-                mainTableConstans::TENANT_TABLE_DBPASSWORD => $password != "" ? $this->encrypt_decrypt("encrypt", $password) : "",
-                mainTableConstans::TENANT_TABLE_COMPANY_ID => $companyId,
-                mainTableConstans::TENANT_TABLE_DOMAIN_NAME => $subDomain
-            ];
-
-            Log::info("Store Information for Newly Created Database | Multi Tenant Step - 2");
-            $this->storeDatabaseDetail($databaseDetails);
-
-            //create table in customer database and Store data into new table
-            $data[mainTableConstans::COMPANY_PROFILE_PASSWORD] = $this->encrypt_decrypt("encrypt", trim($data[mainTableConstans::COMPANY_PROFILE_PASSWORD]));
-            $data[mainTableConstans::COMPANY_PROFILE_COMPANY_NAME] = $companyName;
-            $data[mainTableConstans::COMPANY_PROFILE_CREATED_AT] = date('Y-m-d H:i:s');
-            $data[mainTableConstans::COMPANY_PROFILE_UPDATED_AT] = date('Y-m-d H:i:s');
-            $data[mainTableConstans::TENANT_TABLE_DOMAIN_NAME] = $subDomain;
-
-            Log::info("Create Table for new tenant and store information about company | Multi Tenant Step - 3");
-            $this->createCustomerProfile($data);
+            event(new TenantProcess($companyName, $data));
 
             return redirect()->back()->with('success', Str::upper($data[mainTableConstans::COMPANY_TABLE_COMPANY_NAME]) . ' Company Registred Successfully. Please Check Your Email !');
         } catch (\Exception $exception) {
