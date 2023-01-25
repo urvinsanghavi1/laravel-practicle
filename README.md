@@ -1,4 +1,4 @@
-<img src="https://www.google.com/url?sa=i&url=https%3A%2F%2Findiabizassist.com%2Fcompany-registrations%2F&psig=AOvVaw2I_45fXHNgNHo436olKUZ1&ust=1674719585580000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCKi0--ie4vwCFQAAAAAdAAAAABAI" alt="laravel-practice" />
+<img src="/img/Company-Registration.png" alt="laravel-practice" />
 
 ## Steps To Setup Project
 
