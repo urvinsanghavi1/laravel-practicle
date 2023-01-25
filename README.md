@@ -36,7 +36,7 @@ Company Admin
 
 Super Admin Login Credentials
 
-Username : admin@admin.com
-Password : password
+- Username : admin@admin.com
+- Password : password
 
 Note: Log File - Laravel.log
